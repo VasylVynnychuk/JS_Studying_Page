@@ -1,67 +1,90 @@
-/* Задания на урок:
-
-1) Удалить все рекламные блоки со страницы (правая часть сайта)
-
-2) Изменить жанр фильма, поменять "комедия" на "драма"
-
-3) Изменить задний фон постера с фильмом на изображение "bg.jpg". Оно лежит в папке img.
-Реализовать только при помощи JS
-
-4) Список фильмов на странице сформировать на основании данных из этого JS файла.
-Отсортировать их по алфавиту 
-
-5) Добавить нумерацию выведенных фильмов */
-
 'use strict';
 
-const movieDB = {
-    movies: [
-        "Логан",
-        "Лига справедливости",
-        "Ла-ла лэнд",
-        "Одержимость",
-        "Скотт Пилигрим против..."
-    ]
-};
+document.addEventListener('DOMContentLoaded', () => {
+    const movieDB = {
+        movies: [
+            "Логан",
+            "Лига справедливости",
+            "Ла-ла лэнд",
+            "Одержимость",
+            "Скотт Пилигрим против..."
+        ]
+    };
+    
+    const promoAdv = document.querySelector('.promo__adv'),
+          promoImg = promoAdv.querySelectorAll('img'),
+          promoText = promoAdv.querySelector('.promo__adv-title'),
+          promoBg = document.querySelector('.promo__bg'),
+          promoGenre = promoBg.querySelector('.promo__genre'),
+          promoListFilms = document.querySelectorAll('.promo__interactive-list'),
+          addForm = document.querySelector('.add'),
+          addFilmInput = addForm.querySelector('.adding__input'),
+          checkBox = addForm.querySelector("[type=checkbox]");
+    
 
-const promoAdv = document.querySelector('.promo__adv'),
-      promoImg = promoAdv.querySelectorAll('img'),
-      promoText = promoAdv.querySelector('.promo__adv-title'),
-      promoBg = document.querySelector('.promo__bg'),
-      promoGenre = promoBg.querySelector('.promo__genre'),
-      promoListFilms = document.querySelectorAll('.promo__interactive-list');
-    //   promoListFilms = document.querySelectorAll('.promo__interactive-item');
+    const deleteAdv = (arr) => {
+        promoText.remove();
+        arr.forEach(item => {
+            item.remove();
+        });
+    };
 
-// 1
-// console.log(promoGenre);
-promoText.remove();
+    const makeChanges = () => {
+        promoGenre.textContent = "ДРАМА";
+        promoBg.style.backgroundImage = 'url("img/bg.jpg")';
+    };
+    
+    const sortArr = (arr) => {
+        arr.sort();
+    };
+    
+    addForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+    
+        let filmName = addFilmInput.value;
+        const favoriteFilm = checkBox.checked;
+        
+        if (filmName) {
 
-promoImg.forEach(item => {
-    item.remove();
+            if (filmName.length > 21) {
+                filmName = `${filmName.substring(0, 22)}...`;
+            }
+
+            if (favoriteFilm) {
+                console.log('Favorite film');
+            }
+            movieDB.movies.push(filmName);
+            sortArr(movieDB.movies);
+            
+            createMovieList(movieDB.movies, promoListFilms[0]);
+        }
+    
+        event.target.reset();
+    });
+    
+    function createMovieList(films, parent) {
+        parent.innerHTML = "";
+        sortArr(films);
+    
+        films.forEach((item, i) => {
+            parent.innerHTML += `
+                <li class="promo__interactive-item">${i + 1} ${item}
+                    <div class="delete"></div>
+                </li>
+            `; 
+        });
+
+        document.querySelectorAll('.delete').forEach((btn, i) => {
+            btn.addEventListener('click', () => {
+                btn.parentElement.remove();
+                films.splice(i, 1);
+
+                createMovieList(films, parent);
+            });
+        }); 
+    }
+
+    deleteAdv(promoImg);
+    makeChanges();
+    createMovieList(movieDB.movies, promoListFilms[0]);
 });
-
-// 2
-promoGenre.textContent = "ДРАМА";
-
-// 3
-promoBg.style.backgroundImage = 'url("img/bg.jpg")';
-
-// 4 5
-// console.log(promoListFilms);
-promoListFilms[0].innerHTML = "";
-
-movieDB.movies.sort();
-
-movieDB.movies.forEach((item, i) => {
-    promoListFilms[0].innerHTML += `
-        <li class="promo__interactive-item">${i + 1} ${item}
-            <div class="delete"></div>
-        </li>
-    `; 
-});
-
-// promoListFilms.forEach((item, i) => {
-//     item.textContent = `${i + 1} ${movieDB.movies[i]}`;
-// });
-
-
